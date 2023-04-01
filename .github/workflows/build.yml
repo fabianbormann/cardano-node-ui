@@ -1,0 +1,32 @@
+name: Build Electron Applications
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+  workflow_dispatch:
+
+jobs:
+  release:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+    if: "contains(github.event.head_commit.message, 'release-please--branches--main')"
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v2
+
+      - name: 🫡 Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+
+      - name: 🔨 Build application
+        uses: samuelmeuli/action-electron-builder@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
