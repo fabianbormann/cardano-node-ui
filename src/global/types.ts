@@ -20,3 +20,10 @@ export type ParticleNetworkOptions = {
   density?: number;
   useWindowForMouseEvents?: boolean;
 };
+
+export type NodeStatusMessage = {
+  timestamp: number;
+  status: NodeStatus;
+  message: string;
+  id: number;
+};

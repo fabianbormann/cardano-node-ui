@@ -8,6 +8,9 @@ const {
 const path = require('path');
 const isDev = require('electron-is-dev');
 const Downloader = require('nodejs-file-downloader');
+const spawn = require('child_process').spawn;
+const os = require('os');
+const fs = require('fs/promises');
 
 const networks = {
   mainnet: {
@@ -21,28 +24,82 @@ const networks = {
   },
 };
 
-const nodeUrl = {
-  darwin:
-    'https://update-cardano-mainnet.iohk.io/cardano-node-releases/cardano-node-1.35.5-macos.tar.gz',
-  win32:
-    'https://update-cardano-mainnet.iohk.io/cardano-node-releases/cardano-node-1.35.5-win64.zip',
-  linux:
-    'https://update-cardano-mainnet.iohk.io/cardano-node-releases/cardano-node-1.35.5-linux.tar.gz',
+const nodeBinaries = {
+  darwin: 'cardano-node-1.35.5-macos.tar.gz',
+  win32: 'cardano-node-1.35.5-win64.zip',
+  linux: 'cardano-node-1.35.5-linux.tar.gz',
 };
 
-const downloadNodeBinary = async (directory) => {
-  const binaryUrl = nodeUrl[process.platform];
-  if (binaryUrl) {
+const nodeBaseUrl =
+  'https://update-cardano-mainnet.iohk.io/cardano-node-releases/';
+
+const downloadNodeBinary = async (directory, feedbackFunction) => {
+  const nodeBinary = nodeBinaries[process.platform];
+  if (nodeBinary) {
     const downloader = new Downloader({
-      url: binaryUrl,
+      url: `${nodeBaseUrl}${nodeBinary}`,
       directory: directory,
+      cloneFiles: false,
+      onProgress: (percentage) => {
+        feedbackFunction(
+          `download cardano-node binary ${Math.round(percentage)}%`
+        );
+      },
     });
+
     try {
-      const { filePath, downloadStatus } = await downloader.download();
-      console.log('All done');
+      await downloader.download();
     } catch (error) {
       console.log('Download failed', error);
+      throw error;
     }
+  }
+};
+
+const unpackArchive = (directory) =>
+  new Promise((resolve, reject) => {
+    const nodeBinary = nodeBinaries[process.platform];
+    const destinationPath = path.join(
+      directory,
+      nodeBinary.replace('.tar.gz', '').replace('.zip', '')
+    );
+
+    fs.mkdir(destinationPath, { recursive: true })
+      .then(() => {
+        const child = spawn('tar', [
+          '-xzf',
+          path.join(directory, nodeBinary),
+          '-C',
+          destinationPath,
+        ]);
+        child.on('close', (code) => {
+          console.log(`child process exited with code ${code}`);
+          if (code === 0) {
+            resolve();
+          } else {
+            reject();
+          }
+        });
+
+        child.stdout.on('data', (data) => {
+          console.log(`stdout: ${data}`);
+        });
+
+        child.stderr.on('data', (data) => {
+          console.error(`stderr: ${data}`);
+        });
+      })
+      .catch((error) => reject(error));
+  });
+
+const startNode = async (directory, network, feedbackFunction) => {
+  const platform = os.platform();
+
+  let scriptName;
+  if (platform === 'win32') {
+    scriptName = 'script.bat';
+  } else {
+    scriptName = 'script.sh';
   }
 };
 
@@ -60,6 +117,7 @@ const downloadConfig = async (directory, network) => {
   for (const filename of filenames) {
     const downloader = new Downloader({
       url: filename,
+      cloneFiles: false,
       directory: directory,
     });
     try {
@@ -67,6 +125,7 @@ const downloadConfig = async (directory, network) => {
       console.log('All done');
     } catch (error) {
       console.log('Download failed', error);
+      throw error;
     }
   }
 };
@@ -110,25 +169,88 @@ app.whenReady().then(() => {
     });
   });
 
-  ipcMain.on('start-node', (event, directory, network = 'mainnet') => {
+  ipcMain.on('start-node', async (event, directory, network = 'mainnet') => {
     mainWindow.webContents.send('node-status', {
+      id: 0,
+      timestamp: new Date().getTime(),
       status: 'download',
-      message: 'Download cardano-node binary',
+      message: 'download cardano-node binary #{...}',
     });
-    downloadNodeBinary(directory);
+
+    try {
+      const updateDownloadStatus = (message) => {
+        mainWindow.webContents.send('node-status', {
+          id: 0,
+          timestamp: new Date().getTime(),
+          status: 'download',
+          message: message,
+        });
+      };
+
+      await downloadNodeBinary(directory, updateDownloadStatus);
+    } catch (error) {
+      console.error(error);
+      mainWindow.webContents.send('node-status', {
+        id: -1,
+        timestamp: new Date().getTime(),
+        status: 'error',
+        message: `error while downloading the cardano-node binary #{:x:}`,
+      });
+      return;
+    }
+
     mainWindow.webContents.send('node-status', {
-      status: 'download',
-      message: 'Download configuration and node topology',
-    });
-    downloadConfig(directory, network);
-    mainWindow.webContents.send('node-status', {
+      id: 0,
+      timestamp: new Date().getTime(),
       status: 'running',
-      message: 'Node initialization running',
+      message:
+        'cardano-node binary binary download completed #{:white_check_mark:}',
+    });
+    mainWindow.webContents.send('node-status', {
+      id: 1,
+      timestamp: new Date().getTime(),
+      status: 'download',
+      message: 'download configuration and node topology #{...}',
+    });
+    await downloadConfig(directory, network);
+    mainWindow.webContents.send('node-status', {
+      id: 1,
+      timestamp: new Date().getTime(),
+      status: 'running',
+      message:
+        'configuration and node topology download completed #{:white_check_mark:}',
+    });
+
+    try {
+      await unpackArchive(directory);
+    } catch (error) {
+      console.error(error);
+      mainWindow.webContents.send('node-status', {
+        id: -1,
+        timestamp: new Date().getTime(),
+        status: 'error',
+        message: `error while unpacking the cardano-node binary #{:x:}`,
+      });
+      return;
+    }
+
+    mainWindow.webContents.send('node-status', {
+      id: -1,
+      timestamp: new Date().getTime(),
+      status: 'running',
+      message: `cardano-node binary has been successfully unpacked #{:white_check_mark:}`,
+    });
+
+    mainWindow.webContents.send('node-status', {
+      id: 2,
+      timestamp: new Date().getTime(),
+      status: 'running',
+      message: 'node initialization running  #{...}',
     });
   });
 
   ipcMain.handle('getDefaultPath', () =>
-    path.join(app.getPath('home'), '.cardano-node')
+    path.join(app.getPath('home'), '.cardano-node-ui')
   );
 });
 

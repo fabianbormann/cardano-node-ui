@@ -42,10 +42,13 @@ const Footer = () => {
       >
         <Typography sx={{ display: 'flex', justifyContent: 'center' }}>
           {' '}
-          Created with <FavoriteIcon sx={{ ml: 1, mr: 1 }} /> by Fabian Bormann
-          ©2023
+          Created with <FavoriteIcon
+            color="secondary"
+            sx={{ ml: 1, mr: 1 }}
+          />{' '}
+          by Fabian Bormann ©2023
         </Typography>
-        <Grid>
+        <Grid sx={{ ml: 1 }}>
           <IconButton
             href="https://discord.gg/anryt23SB3"
             target="_blank"
@@ -54,7 +57,7 @@ const Footer = () => {
             <DiscordIcon />
           </IconButton>
           <IconButton
-            href="https://github.com/fabianbormann/Coineda"
+            href="https://github.com/fabianbormann/cardano-node-ui"
             target="_blank"
             rel="noreferrer"
           >

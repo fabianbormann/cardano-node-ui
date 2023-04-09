@@ -1,5 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { IpcEventListener, MessageType, NodeStatus } from '../global/types';
+import {
+  IpcEventListener,
+  MessageType,
+  NodeStatus,
+  NodeStatusMessage,
+} from '../global/types';
 import {
   Alert,
   Button,
@@ -12,6 +17,8 @@ import {
   useTheme,
 } from '@mui/material';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import reactStringReplace from 'react-string-replace';
+import { Box } from '@mui/system';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -22,10 +29,9 @@ const Dashboard = () => {
   const [directory, setDirectory] = useState('');
   const [nodeRunning, setNodeRunning] = useState(false);
   const [nodeStatus, setNodeStatus] = useState<NodeStatus>('idle');
-  const [nodeMessage, setNodeMessage] = useState('');
-  const [nodeLog, setNodeLog] = useState(
-    'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
-  );
+  const [nodeLog, setNodeLog] = useState<Array<NodeStatusMessage>>([
+    { status: 'idle', message: 'cardano-node-ui:~$', id: -1, timestamp: 0 },
+  ]);
 
   useEffect(() => {
     const getDefaultDirectory: () => Promise<string> = (window as any).electron
@@ -41,11 +47,18 @@ const Dashboard = () => {
     const addEventListener: IpcEventListener = (window as any).electron
       ?.addEventListener;
 
+    const removeAllListeners: (channel: string) => void = (window as any)
+      .electron?.removeAllListeners;
+
     if (typeof addEventListener === 'function') {
-      addEventListener('node-status', ({ status, message }) => {
-        setNodeStatus(status);
-        setNodeMessage(message);
+      addEventListener('node-status', (nodeMessage: NodeStatusMessage) => {
+        setNodeStatus(nodeMessage.status);
+        setNodeLog((previousMessages) => [...previousMessages, nodeMessage]);
       });
+
+      return () => {
+        removeAllListeners('node-status');
+      };
     }
   }, []);
 
@@ -89,6 +102,74 @@ const Dashboard = () => {
       startNode(directory);
       setNodeRunning(true);
     }
+  };
+
+  const format = (logLines: Array<NodeStatusMessage>) => {
+    if (logLines.length > 1) {
+      const messages: { [timestamp: number]: { text: string; id: number } } =
+        {};
+      const ids: Array<number> = [];
+
+      for (const line of logLines) {
+        if (line.timestamp > 0) {
+          let formattedMessage = line.message;
+          formattedMessage = formattedMessage.replaceAll(
+            '#{:white_check_mark:}',
+            '✅'
+          );
+          formattedMessage = formattedMessage.replaceAll('#{:x:}', '❌');
+
+          if (ids.includes(line.id)) {
+            const timestamp = Object.keys(messages).find(
+              (key) => messages[key as unknown as number].id === line.id
+            ) as unknown as number;
+            messages[timestamp].text = `cardano-node-ui:~$ ${formattedMessage}`;
+          } else {
+            messages[line.timestamp] = {
+              text: `cardano-node-ui:~$ ${formattedMessage}`,
+              id: line.id,
+            };
+            ids.push(line.id);
+          }
+        }
+      }
+
+      let text: Array<any> = [];
+      const timestamps: Array<number> = Object.keys(
+        messages
+      ).sort() as unknown as number[];
+      for (const timestamp of timestamps) {
+        text = [
+          ...text,
+          <div>
+            {reactStringReplace(
+              messages[timestamp].text,
+              '#{...}',
+              (match, i) => (
+                <>
+                  <span className="dot">.</span>
+                  <span className="dot">.</span>
+                  <span className="dot">.</span>
+                </>
+              )
+            )}
+          </div>,
+        ];
+      }
+
+      return text;
+    } else {
+      return logLines[0].message;
+    }
+  };
+
+  const getStatusColor = (status: NodeStatus) => {
+    if (status === 'error') {
+      return 'error';
+    } else if (status === 'running') {
+      return 'success';
+    }
+    return 'info';
   };
 
   return (
@@ -166,26 +247,23 @@ const Dashboard = () => {
             background: '#46525D',
           }}
         >
-          <Grid item sx={{ p: 2 }}>
-            <Chip label={nodeStatus} color="info" />
+          <Grid item sx={{ pl: 2, pr: 2, pt: 2, pb: 1 }}>
+            <Chip label={nodeStatus} color={getStatusColor(nodeStatus)} />
           </Grid>
-          <InputBase
+          <Box
             sx={{
               background: '#46525D',
               color: 'white',
               minWidth: 600,
               height: 200,
-              p: 2,
+              pl: 2,
+              pr: 2,
+              pb: 2,
+              verticalAlign: 'top',
             }}
-            multiline
-            readOnly
-            spellCheck={false}
-            minRows={3}
-            value={nodeLog}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setNodeLog(event.target.value);
-            }}
-          />
+          >
+            {format(nodeLog)}
+          </Box>
         </Grid>
       </Grid>
     </Grid>

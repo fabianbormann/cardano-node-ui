@@ -1,29 +1,30 @@
-# Coineda
+# Cardano Node Ui
 
 <p align="left">
 
-<img alt="Release" src="https://img.shields.io/github/actions/workflow/status/fabianbormann/Coineda/release.yml?label=Release&style=for-the-badge" />
-<img alt="Test" src="https://img.shields.io/github/actions/workflow/status/fabianbormann/Coineda/test.yml?label=tests&style=for-the-badge" />
-<a href="https://discord.gg/anryt23SB3"><img alt="Discord" src="https://img.shields.io/discord/1066798434671141056?label=Discord%20Chat&style=for-the-badge" /></a>
+<img alt="Release" src="https://img.shields.io/github/actions/workflow/status/fabianbormann/cardano-node-ui/release.yml?label=Release&style=for-the-badge" />
 <a href="https://conventionalcommits.org"><img alt="conventionalcommits" src="https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&style=for-the-badge" /></a>
 </p>
 
-Coineda aims to be a free to use, open source and local running crypto tracking and tax tool
-
-<img src="https://user-images.githubusercontent.com/1525818/216791075-507cc5ca-9cca-4b39-9f1d-690af6c08d2a.png" width="80%"/>
+This project aims to provide a streamlined, single-click ui solution for launching a Cardano node
 
 ## ❤️‍🔥 Motivation
 
-As a crypto trader, I understand the importance of tracking my investments and maintaining privacy. That's why I have taken the initiative to create a free, open-source cryptocurrency tracking tool that operates locally, keeping all data secure and private on the user's device. I believe that this solution addresses the concerns of many traders and I am looking forward to share it you.
+Currently, there is no graphical user interface to start and monitor a Cardano node.
 
-## ❗️ Disclaimer ❗️
+For some testing or development purposes, a personal Cardano node is essential. However, without a simple and streamlined user interface, users must rely on command line tools to set up and manage nodes, which can be time consuming. This can be time consuming. It requires reading lengthy documentation and executing a series of commands in a terminal.
 
-Coineda does not provide tax, legal or accounting advices. The provided dashboard and rudimentary tax calculations may contain errors, are incorrect for your country or doesn't cover all tax relevant regulations. Those calculations are developed to the best of my knowledge but I'm not a tax expert and I do not take any responsibility for incorrect calculations.
+This project aims to provide a one-click solution for starting a Cardano node and monitoring its synchronization progress. By offering an intuitive and easy-to-use interface, we hope to make it easier for individuals and organizations to participate in the Cardano network and contribute to its growth.
 
 ## 💪 Contributing
 
-Thanks for considering contributing to Coineda! Your help is greatly appreciated!
+Thanks for considering contributing to cardano-node-ui! Your help is greatly appreciated!
 
-We're always looking for contributors to help us with the project's [translations](./src/translations/) and [import sources](./src/import/source/). The great news is that both are modularized, so you can get started without needing a deep understanding of the codebase.
+If you would like to contribute, please follow these steps:
+
+- Fork this repository.
+- Create a new branch with your changes.
+- Submit a pull request for review.
+- We appreciate all contributions and thank you for your support.
 
 🙏 For more information, please checkout our [contributing guidelines](./CONTRIBUTING.md).

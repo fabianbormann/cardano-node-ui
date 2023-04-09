@@ -1,4 +1,4 @@
-name: Create a new Coineda Release
+name: Create a new Cardano Node Ui Release
 
 on:
   push:

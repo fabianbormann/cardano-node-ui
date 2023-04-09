@@ -1,8 +1,8 @@
 {
   "name": "cardano-node-ui",
-  "description": "This project aims to be a simple one-click solution to spwan up a cardano node and check it's sync process",
-  "version": "0.0.1",
-  "author": "Fabian Bormann <fabian.bormann@cardano-foundation.org>",
+  "description": "This project aims to provide a streamlined, single-click ui solution for launching a Cardano node",
+  "version": "0.1.0",
+  "author": "Fabian Bormann <contact@coineda.io>",
   "license": "Apache-2.0",
   "dependencies": {
     "@emotion/react": "^11.10.5",
@@ -24,6 +24,7 @@
     "react-i18next": "^12.1.4",
     "react-router-dom": "^6.8.0",
     "react-scripts": "^5.0.1",
+    "react-string-replace": "^1.1.0",
     "recharts": "^2.3.2",
     "tslib": "^2.5.0",
     "typescript": "^4.9.5",
