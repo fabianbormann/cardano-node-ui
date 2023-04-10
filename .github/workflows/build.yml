@@ -30,3 +30,19 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+
+      - name: 📝 Update Readme with Version
+        run: |
+          PREVIOUS_VERSION=$(perl -ne 'print $1 if /📦 Cardano Node Ui v([^\s]+)/' README.md)
+          VERSION=$(echo "${{ github.ref }}" | sed 's/refs\/tags\/v//')
+          sed -i "s/fabianbormann\/cardano-node-ui\/releases\/download\/v$PREVIOUS_VERSION\/cardano-node-ui-$PREVIOUS_VERSION.dmg/fabianbormann\/cardano-node-ui\/releases\/download\/v$VERSION\/cardano-node-ui-$VERSION.dmg/g" README.md
+          sed -i "s/fabianbormann\/cardano-node-ui\/releases\/download\/v$PREVIOUS_VERSION\/cardano-node-ui-$PREVIOUS_VERSION.AppImage/fabianbormann\/cardano-node-ui\/releases\/download\/v$VERSION\/cardano-node-ui-$VERSION.AppImage/g" README.md
+          sed -i "s/fabianbormann\/cardano-node-ui\/releases\/download\/v$PREVIOUS_VERSION\/cardano-node-ui-Setup-$PREVIOUS_VERSION.exe/fabianbormann\/cardano-node-ui\/releases\/download\/v$VERSION\/cardano-node-ui-Setup-$VERSION.exe/g" README.md
+          sed -i "s/📦 Cardano Node Ui v$VERSION/📦 Cardano Node Ui v${{ github.ref.replace('refs/tags/v', '') }}/g" README.md
+
+      - name: 📬 Commit Changes
+        uses: EndBug/add-and-commit@v7
+        with:
+          author_name: GitHub Actions
+          author_email: actions@github.com
+          message: "chore: update README.md with version ${{ github.ref.replace('refs/tags/v', '') }}"
