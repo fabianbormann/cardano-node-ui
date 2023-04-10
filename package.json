@@ -18,6 +18,7 @@
     "i18next": "^22.4.9",
     "i18next-browser-languagedetector": "^7.0.1",
     "i18next-localstorage-cache": "^1.1.1",
+    "ip": "^1.1.8",
     "nodejs-file-downloader": "^4.10.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

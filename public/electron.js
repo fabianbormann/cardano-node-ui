@@ -11,16 +11,17 @@ const Downloader = require('nodejs-file-downloader');
 const spawn = require('child_process').spawn;
 const os = require('os');
 const fs = require('fs/promises');
+const ip = require('ip');
 
 const networks = {
   mainnet: {
-    networkMagic: 764824073,
+    protocolMagic: 764824073,
   },
   preprod: {
-    networkMagic: 1,
+    protocolMagic: 1,
   },
   preview: {
-    networkMagic: 2,
+    protocolMagic: 2,
   },
 };
 
@@ -40,6 +41,7 @@ const downloadNodeBinary = async (directory, feedbackFunction) => {
       url: `${nodeBaseUrl}${nodeBinary}`,
       directory: directory,
       cloneFiles: false,
+      skipExistingFileName: true,
       onProgress: (percentage) => {
         feedbackFunction(
           `download cardano-node binary ${Math.round(percentage)}%`
@@ -59,18 +61,18 @@ const downloadNodeBinary = async (directory, feedbackFunction) => {
 const unpackArchive = (directory) =>
   new Promise((resolve, reject) => {
     const nodeBinary = nodeBinaries[process.platform];
-    const destinationPath = path.join(
+    const binaryPath = path.join(
       directory,
       nodeBinary.replace('.tar.gz', '').replace('.zip', '')
     );
 
-    fs.mkdir(destinationPath, { recursive: true })
+    fs.mkdir(binaryPath, { recursive: true })
       .then(() => {
         const child = spawn('tar', [
           '-xzf',
           path.join(directory, nodeBinary),
           '-C',
-          destinationPath,
+          binaryPath,
         ]);
         child.on('close', (code) => {
           console.log(`child process exited with code ${code}`);
@@ -92,18 +94,55 @@ const unpackArchive = (directory) =>
       .catch((error) => reject(error));
   });
 
-const startNode = async (directory, network, feedbackFunction) => {
-  const platform = os.platform();
+const startNode = (directory, network) =>
+  new Promise((resolve, reject) => {
+    const nodeBinary = nodeBinaries[process.platform];
+    const configDirectory = path.join(directory, `${network}-config`);
+    const databaseDirectory = path.join(directory, `${network}-db`);
+    const binaryPath = path.join(
+      directory,
+      nodeBinary.replace('.tar.gz', '').replace('.zip', '')
+    );
 
-  let scriptName;
-  if (platform === 'win32') {
-    scriptName = 'script.bat';
-  } else {
-    scriptName = 'script.sh';
-  }
-};
+    const child = spawn(path.join(binaryPath, 'cardano-node'), [
+      'run',
+      '--topology',
+      path.join(configDirectory, 'topology.json'),
+      '--database-path',
+      databaseDirectory,
+      '--socket-path',
+      path.join(databaseDirectory, 'node.socket'),
+      '--host-addr',
+      ip.address(),
+      '--port',
+      '3001',
+      '--config',
+      path.join(configDirectory, 'config.json'),
+    ]);
+    child.on('close', (code) => {
+      console.log(`child process exited with code ${code}`);
+      if (code === 0) {
+        resolve();
+      } else {
+        reject();
+      }
+    });
+
+    child.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`);
+    });
+
+    child.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+    });
+  });
 
 const downloadConfig = async (directory, network) => {
+  const configDirectory = path.join(directory, `${network}-config`);
+  const databaseDirectory = path.join(directory, `${network}-db`);
+  await fs.mkdir(configDirectory, { recursive: true });
+  await fs.mkdir(databaseDirectory, { recursive: true });
+
   const filenames = [
     `https://book.world.dev.cardano.org/environments/${network}/config.json`,
     `https://book.world.dev.cardano.org/environments/${network}/db-sync-config.json`,
@@ -118,7 +157,7 @@ const downloadConfig = async (directory, network) => {
     const downloader = new Downloader({
       url: filename,
       cloneFiles: false,
-      directory: directory,
+      directory: configDirectory,
     });
     try {
       const { filePath, downloadStatus } = await downloader.download();
@@ -155,6 +194,8 @@ function createWindow() {
   mainWindow.maximize();
   return mainWindow;
 }
+
+let intervalId = -1;
 
 app.whenReady().then(() => {
   const mainWindow = createWindow();
@@ -247,6 +288,56 @@ app.whenReady().then(() => {
       status: 'running',
       message: 'node initialization running  #{...}',
     });
+
+    startNode(directory, network);
+    const nodeBinary = nodeBinaries[process.platform];
+    const binaryPath = path.join(
+      directory,
+      nodeBinary.replace('.tar.gz', '').replace('.zip', '')
+    );
+
+    const getCurrentTip = () => {
+      const databaseDirectory = path.join(directory, `${network}-db`);
+      const child = spawn(
+        path.join(binaryPath, 'cardano-cli'),
+        [
+          'query',
+          'tip',
+          network === 'mainnet'
+            ? '--mainnet'
+            : `--testnet-magic ${networks[network].protocolMagic}`,
+        ],
+        {
+          env: {
+            CARDANO_NODE_SOCKET_PATH: path.join(
+              databaseDirectory,
+              'node.socket'
+            ),
+          },
+        }
+      );
+
+      child.stdout.on('data', (data) => {
+        try {
+          const response = JSON.parse(data);
+          mainWindow.webContents.send('node-status', {
+            id: 2,
+            timestamp: new Date().getTime(),
+            status: 'running',
+            message: `node sync progress: ${response.syncProgress}%`,
+          });
+        } catch (error) {
+          if (!(error instanceof SyntaxError)) {
+            console.error(error);
+          }
+        }
+      });
+      child.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`);
+      });
+    };
+
+    intervalId = setInterval(() => getCurrentTip(), 5000);
   });
 
   ipcMain.handle('getDefaultPath', () =>
