@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/fabianbormann/cardano-node-ui/compare/v0.1.0...v0.1.1) (2023-04-10)
+
+
+### Bug Fixes
+
+* remove warnings and check npm build ([57a351a](https://github.com/fabianbormann/cardano-node-ui/commit/57a351aa38b7cdce0b27d2f3ddddd1228f685459))
+
 ## 0.1.0 (2023-04-10)
 
 
