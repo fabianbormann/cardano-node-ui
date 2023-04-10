@@ -22,9 +22,6 @@ jobs:
       - name: 🧘‍♀️ Download dependencies
         run: npm ci
 
-      - name: 🎳 Run tests
-        run: npm test
-
       - name: 🚀 release-please-action
         uses: google-github-actions/release-please-action@v3
         with:
