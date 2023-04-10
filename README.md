@@ -3,6 +3,7 @@
 <p align="left">
 
 <img alt="Release" src="https://img.shields.io/github/actions/workflow/status/fabianbormann/cardano-node-ui/release.yml?label=Release&style=for-the-badge" />
+<img alt="Build" src="https://img.shields.io/github/actions/workflow/status/fabianbormann/cardano-node-ui/build.yml?label=Build&style=for-the-badge" />
 <a href="https://conventionalcommits.org"><img alt="conventionalcommits" src="https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&style=for-the-badge" /></a>
 </p>
 
