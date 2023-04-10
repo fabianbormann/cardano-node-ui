@@ -1,17 +1,10 @@
 import React from 'react';
-import {
-  createSvgIcon,
-  Grid,
-  IconButton,
-  Typography,
-  useTheme,
-} from '@mui/material';
+import { createSvgIcon, Grid, IconButton, Typography } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import EmailIcon from '@mui/icons-material/Email';
 import GitHubIcon from '@mui/icons-material/GitHub';
 
 const Footer = () => {
-  const theme = useTheme();
   const DiscordIcon = createSvgIcon(
     <svg
       viewBox="0 0 71 55"

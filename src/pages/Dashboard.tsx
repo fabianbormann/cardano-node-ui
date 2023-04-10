@@ -14,14 +14,12 @@ import {
   InputAdornment,
   InputBase,
   Snackbar,
-  useTheme,
 } from '@mui/material';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import reactStringReplace from 'react-string-replace';
 import { Box } from '@mui/system';
 
 const Dashboard = () => {
-  const theme = useTheme();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarType, setSnackbarType] = useState<MessageType>('success');
   const [snackbarMessage, setSnackbarMessage] = useState('');

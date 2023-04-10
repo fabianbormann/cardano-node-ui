@@ -1,7 +1,7 @@
 import React from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { Dashboard } from './pages';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import { Footer } from './components';
 import Toolbar from '@mui/material/Toolbar';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
@@ -42,7 +42,6 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 const App = () => {
-  const theme = useTheme();
   return (
     <Router>
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
