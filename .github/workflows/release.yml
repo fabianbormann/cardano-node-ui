@@ -26,4 +26,6 @@ jobs:
         uses: google-github-actions/release-please-action@v3
         with:
           release-type: node
-          versioning-strategy: always-bump-patch
+          release-as: 0.1.0
+          bump-minor-pre-major: true
+          bump-patch-for-minor-pre-major: true
