@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/fabianbormann/cardano-node-ui/compare/v0.1.1...v0.1.1) (2023-04-10)
+
+
+### Miscellaneous Chores
+
+* release 0.1.1 ([0530d47](https://github.com/fabianbormann/cardano-node-ui/commit/0530d47fb0187242a6faaa3efba49b2b5678c604))
+
 ## [0.1.1](https://github.com/fabianbormann/cardano-node-ui/compare/v0.1.0...v0.1.1) (2023-04-10)
 
 
