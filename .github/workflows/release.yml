@@ -6,22 +6,14 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   create_release:
     runs-on: ubuntu-latest
-    if: "${{ !contains(github.event.head_commit.message, 'release-please--branches--main') }}"
     steps:
-      - name: ⬇️ Checkout repository
-        uses: actions/checkout@v3
-
-      - name: 🫡 Setup node
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16
-
-      - name: 🧘‍♀️ Download dependencies
-        run: npm ci
-
       - name: 🚀 release-please-action
         uses: google-github-actions/release-please-action@v3
         with:
