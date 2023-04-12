@@ -13,7 +13,10 @@ import {
   IconButton,
   InputAdornment,
   InputBase,
+  MenuItem,
+  Select,
   Snackbar,
+  useTheme,
 } from '@mui/material';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import reactStringReplace from 'react-string-replace';
@@ -23,6 +26,7 @@ const Dashboard = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarType, setSnackbarType] = useState<MessageType>('success');
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [selectedNetwork, setSelectedNetwork] = useState('mainnet');
 
   const [directory, setDirectory] = useState('');
   const [nodeRunning, setNodeRunning] = useState(false);
@@ -30,6 +34,8 @@ const Dashboard = () => {
   const [nodeLog, setNodeLog] = useState<Array<NodeStatusMessage>>([
     { status: 'idle', message: 'cardano-node-ui:~$', id: -1, timestamp: 0 },
   ]);
+
+  const theme = useTheme();
 
   useEffect(() => {
     const getDefaultDirectory: () => Promise<string> = (window as any).electron
@@ -97,7 +103,7 @@ const Dashboard = () => {
 
     const startNode = (window as any).electron?.startNode;
     if (typeof startNode === 'function') {
-      startNode(directory);
+      startNode(directory, selectedNetwork);
       setNodeRunning(true);
     }
   };
@@ -139,7 +145,7 @@ const Dashboard = () => {
       for (const timestamp of timestamps) {
         text = [
           ...text,
-          <div>
+          <div key={timestamp} style={{ marginTop: 2, marginBottom: 2 }}>
             {reactStringReplace(
               messages[timestamp].text,
               '#{...}',
@@ -203,7 +209,7 @@ const Dashboard = () => {
           height: '100%',
         }}
       >
-        <Grid item>
+        <Grid item container sx={{ justifyContent: 'center' }}>
           <InputBase
             sx={{
               minWidth: 500,
@@ -224,7 +230,21 @@ const Dashboard = () => {
               </InputAdornment>
             }
           />
-
+          <Select
+            sx={{
+              ml: 1,
+              background:
+                selectedNetwork === 'mainnet'
+                  ? 'white'
+                  : theme.palette.warning.main,
+            }}
+            value={selectedNetwork}
+            onChange={(event) => setSelectedNetwork(event.target.value)}
+          >
+            <MenuItem value="mainnet">Mainnet</MenuItem>
+            <MenuItem value="preprod">Preprod</MenuItem>
+            <MenuItem value="preview">Preview</MenuItem>
+          </Select>
           <Button
             sx={{ ml: 1, p: 2.5 }}
             variant="contained"
@@ -252,7 +272,6 @@ const Dashboard = () => {
             sx={{
               background: '#46525D',
               color: 'white',
-              minWidth: 600,
               height: 200,
               pl: 2,
               pr: 2,

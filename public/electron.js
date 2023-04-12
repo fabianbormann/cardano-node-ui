@@ -26,9 +26,9 @@ const networks = {
 };
 
 const nodeBinaries = {
-  darwin: 'cardano-node-1.35.5-macos.tar.gz',
-  win32: 'cardano-node-1.35.5-win64.zip',
-  linux: 'cardano-node-1.35.5-linux.tar.gz',
+  darwin: 'cardano-node-1.35.7-macos.tar.gz',
+  win32: 'cardano-node-1.35.7-win64.zip',
+  linux: 'cardano-node-1.35.7-linux.tar.gz',
 };
 
 const nodeBaseUrl =
@@ -177,6 +177,8 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    minWidth: 760,
+    minHeight: 500,
     title: 'Cardano Node UI',
     frame: false,
     icon: image,
@@ -298,24 +300,20 @@ app.whenReady().then(() => {
 
     const getCurrentTip = () => {
       const databaseDirectory = path.join(directory, `${network}-db`);
-      const child = spawn(
-        path.join(binaryPath, 'cardano-cli'),
-        [
-          'query',
-          'tip',
-          network === 'mainnet'
-            ? '--mainnet'
-            : `--testnet-magic ${networks[network].protocolMagic}`,
-        ],
-        {
-          env: {
-            CARDANO_NODE_SOCKET_PATH: path.join(
-              databaseDirectory,
-              'node.socket'
-            ),
-          },
-        }
-      );
+      const args = ['query', 'tip'];
+
+      if (network === 'mainnet') {
+        args.push('--mainnet');
+      } else {
+        args.push('--testnet-magic');
+        args.push(networks[network].protocolMagic);
+      }
+
+      const child = spawn(path.join(binaryPath, 'cardano-cli'), args, {
+        env: {
+          CARDANO_NODE_SOCKET_PATH: path.join(databaseDirectory, 'node.socket'),
+        },
+      });
 
       child.stdout.on('data', (data) => {
         try {

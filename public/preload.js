@@ -11,5 +11,6 @@ contextBridge.exposeInMainWorld('electron', {
     ipcRenderer.removeAllListeners(channel);
   },
   getDefaultDirectory: () => ipcRenderer.invoke('getDefaultPath'),
-  startNode: (directory) => ipcRenderer.send('start-node', directory),
+  startNode: (directory, network) =>
+    ipcRenderer.send('start-node', directory, network),
 });
