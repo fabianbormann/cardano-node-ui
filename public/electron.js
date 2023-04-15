@@ -206,6 +206,10 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 
+  ipcMain.on('close-app', () => {
+    app.quit();
+  });
+
   ipcMain.on('open-dialog', (event) => {
     event.returnValue = dialog.showOpenDialogSync({
       properties: ['openDirectory', 'createDirectory', 'promptToCreate'],

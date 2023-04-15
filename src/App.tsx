@@ -42,6 +42,12 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 const App = () => {
+  const closeApp = () => {
+    const closeElectronApp: Function = (window as any).electron?.closeApp;
+
+    closeElectronApp();
+  };
+
   return (
     <Router>
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -49,6 +55,7 @@ const App = () => {
         <Box sx={{ display: 'flex' }}>
           <IconButton
             aria-label="close"
+            onClick={closeApp}
             sx={{
               position: 'absolute',
               top: 5,

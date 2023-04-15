@@ -1,6 +1,9 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electron', {
+  closeApp: () => {
+    return ipcRenderer.sendSync('close-app');
+  },
   openDialog: () => {
     return ipcRenderer.sendSync('open-dialog');
   },
