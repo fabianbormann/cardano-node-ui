@@ -36,6 +36,8 @@ jobs:
     steps:
       - name: ⬇️ Checkout repository
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 👀 Compute versions
         run: |
@@ -54,9 +56,9 @@ jobs:
           sed -i 's,📦 Cardano Node Ui v${{ env.VERSION }},📦 Cardano Node Ui v${{ env.VERSION }},' README.md
 
       - name: 📬 Commit Changes
-        uses: EndBug/add-and-commit@v9
-        with:
-          author_name: GitHub Actions
-          author_email: actions@github.com
-          message: 'chore: update README.md with version ${{ env.VERSION }}'
-          push: 'origin main --force'
+        run: |
+          git config --global user.name "GitHubAction"
+          git config --global user.email "username@users.noreply.github.com"
+          git add .
+          git commit -m "chore: update README.md with version ${{ env.VERSION }}"
+          git push --force
