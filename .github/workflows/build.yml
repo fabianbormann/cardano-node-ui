@@ -45,10 +45,10 @@ jobs:
         run: |
           echo ${{ env.VERSION }}
           echo ${{ env.PREVIOUS_VERSION }}
-          sed -i s/fabianbormann\/cardano-node-ui\/releases\/download\/v${{ env.PREVIOUS_VERSION }}\/cardano-node-ui-${{ env.PREVIOUS_VERSION }}.dmg/fabianbormann\/cardano-node-ui\/releases\/download\/v${{ env.VERSION }}\/cardano-node-ui-${{ env.VERSION }}.dmg/g README.md
-          sed -i s/fabianbormann\/cardano-node-ui\/releases\/download\/v${{ env.PREVIOUS_VERSION }}\/cardano-node-ui-${{ env.PREVIOUS_VERSION }}.AppImage/fabianbormann\/cardano-node-ui\/releases\/download\/v${{ env.VERSION }}\/cardano-node-ui-${{ env.VERSION }}.AppImage/g README.md
-          sed -i s/fabianbormann\/cardano-node-ui\/releases\/download\/v${{ env.PREVIOUS_VERSION }}\/cardano-node-ui-Setup-${{ env.PREVIOUS_VERSION }}.exe/fabianbormann\/cardano-node-ui\/releases\/download\/v${{ env.VERSION }}\/cardano-node-ui-Setup-${{ env.VERSION }}.exe/g README.md
-          sed -i s/📦 Cardano Node Ui v${{ env.VERSION }}/📦 Cardano Node Ui v${{ env.VERSION }}/g README.md
+          sed -i s,fabianbormann/cardano-node-ui/releases/download/v${{ env.PREVIOUS_VERSION }}/cardano-node-ui-${{ env.PREVIOUS_VERSION }}.dmg,fabianbormann/cardano-node-ui/releases/download/v${{ env.VERSION }}/cardano-node-ui-${{ env.VERSION }}.dmg,g README.md
+          sed -i s,fabianbormann/cardano-node-ui/releases/download/v${{ env.PREVIOUS_VERSION }}/cardano-node-ui-${{ env.PREVIOUS_VERSION }}.AppImage,fabianbormann/cardano-node-ui/releases/download/v${{ env.VERSION }}/cardano-node-ui-${{ env.VERSION }}.AppImage,g README.md
+          sed -i s,fabianbormann/cardano-node-ui/releases/download/v${{ env.PREVIOUS_VERSION }}/cardano-node-ui-Setup-${{ env.PREVIOUS_VERSION }}.exe,fabianbormann/cardano-node-ui/releases/download/v${{ env.VERSION }}/cardano-node-ui-Setup-${{ env.VERSION }}.exe,g README.md
+          sed -i s,📦 Cardano Node Ui v${{ env.VERSION }},📦 Cardano Node Ui v${{ env.VERSION }},g README.md
 
       - name: 📬 Commit Changes
         uses: EndBug/add-and-commit@v7
