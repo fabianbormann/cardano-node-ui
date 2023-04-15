@@ -18,7 +18,7 @@ jobs:
     if: "contains(github.event.head_commit.message, 'release-please--branches--main')"
     steps:
       - name: ⬇️ Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: 🫡 Setup node
         uses: actions/setup-node@v1
@@ -34,6 +34,9 @@ jobs:
     runs-on: ubuntu-latest
     #needs: release
     steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v3
+
       - name: 👀 Compute versions
         run: |
           #echo "PREVIOUS_VERSION=$(perl -ne 'print $1 if /📦 Cardano Node Ui v([^\s]+)/' README.md)" >> $GITHUB_ENV
