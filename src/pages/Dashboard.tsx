@@ -8,7 +8,10 @@ import {
 import {
   Alert,
   Button,
+  Checkbox,
   Chip,
+  FormControlLabel,
+  FormGroup,
   Grid,
   IconButton,
   InputAdornment,
@@ -16,11 +19,66 @@ import {
   MenuItem,
   Select,
   Snackbar,
+  styled,
+  Switch,
+  SwitchProps,
   useTheme,
 } from '@mui/material';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import reactStringReplace from 'react-string-replace';
 import { Box } from '@mui/system';
+
+const Toggle = styled((props: SwitchProps) => (
+  <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
+))(({ theme }) => ({
+  width: 42,
+  height: 26,
+  padding: 0,
+  '& .MuiSwitch-switchBase': {
+    padding: 0,
+    margin: 2,
+    transitionDuration: '300ms',
+    '&.Mui-checked': {
+      transform: 'translateX(16px)',
+      color: '#fff',
+      '& + .MuiSwitch-track': {
+        backgroundColor: theme.palette.secondary.main,
+        opacity: 1,
+        border: 0,
+      },
+      '&.Mui-disabled + .MuiSwitch-track': {
+        opacity: 0.5,
+      },
+    },
+    '&.Mui-focusVisible .MuiSwitch-thumb': {
+      color: theme.palette.secondary.main,
+      border: '6px solid #fff',
+    },
+    '&.Mui-disabled .MuiSwitch-thumb': {
+      color:
+        theme.palette.mode === 'light'
+          ? theme.palette.grey[100]
+          : theme.palette.grey[600],
+    },
+    '&.Mui-disabled + .MuiSwitch-track': {
+      opacity: theme.palette.mode === 'light' ? 0.7 : 0.3,
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    boxSizing: 'border-box',
+    width: 22,
+    height: 22,
+  },
+  '& .MuiSwitch-track': {
+    borderRadius: 26 / 2,
+    backgroundColor: '#A5A5A5',
+    opacity: 1,
+    transition: theme.transitions.create(['background-color'], {
+      duration: 500,
+    }),
+  },
+}));
 
 const Dashboard = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -176,6 +234,25 @@ const Dashboard = () => {
     return 'info';
   };
 
+  const getSocketPath = () => {
+    return (
+      'export CARDANO_NODE_SOCKET_PATH=' +
+      directory +
+      '/' +
+      selectedNetwork +
+      '-db' +
+      '/node.socket'
+    );
+  };
+
+  const copyToClipboard = () => {
+    const socketPath = getSocketPath();
+    navigator.clipboard.writeText(socketPath);
+    setSnackbarMessage(`Copied "${socketPath}" to clipboard`);
+    setSnackbarType('success');
+    setSnackbarOpen(true);
+  };
+
   return (
     <Grid
       container
@@ -210,77 +287,112 @@ const Dashboard = () => {
         }}
       >
         <Grid item container sx={{ justifyContent: 'center' }}>
-          <InputBase
-            sx={{
-              minWidth: 500,
-              background: 'white',
-              p: 2,
-              borderRadius: '4px',
-            }}
-            spellCheck={false}
-            value={directory}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setDirectory(event.target.value);
-            }}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton onClick={openDirectoryDialog} edge="end">
-                  <FolderOpenIcon />
-                </IconButton>
-              </InputAdornment>
-            }
-          />
-          <Select
-            sx={{
-              ml: 1,
-              background:
-                selectedNetwork === 'mainnet'
-                  ? 'white'
-                  : theme.palette.warning.main,
-            }}
-            value={selectedNetwork}
-            onChange={(event) => setSelectedNetwork(event.target.value)}
-          >
-            <MenuItem value="mainnet">Mainnet</MenuItem>
-            <MenuItem value="preprod">Preprod</MenuItem>
-            <MenuItem value="preview">Preview</MenuItem>
-          </Select>
-          <Button
-            sx={{ ml: 1, p: 2.5 }}
-            variant="contained"
-            color="secondary"
-            disableElevation
-            onClick={invokeStartNode}
-          >
-            Start
-          </Button>
+          <Grid item container sx={{ justifyContent: 'center' }}>
+            <InputBase
+              sx={{
+                minWidth: 500,
+                background: 'white',
+                p: 2,
+                borderRadius: '4px',
+              }}
+              spellCheck={false}
+              value={directory}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setDirectory(event.target.value);
+              }}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton onClick={openDirectoryDialog} edge="end">
+                    <FolderOpenIcon />
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
+            <Select
+              sx={{
+                ml: 1,
+                background:
+                  selectedNetwork === 'mainnet'
+                    ? 'white'
+                    : theme.palette.warning.main,
+              }}
+              value={selectedNetwork}
+              onChange={(event) => setSelectedNetwork(event.target.value)}
+            >
+              <MenuItem value="mainnet">Mainnet</MenuItem>
+              <MenuItem value="preprod">Preprod</MenuItem>
+              <MenuItem value="preview">Preview</MenuItem>
+            </Select>
+            <Button
+              sx={{ ml: 1, p: 2.5 }}
+              variant="contained"
+              color="secondary"
+              disableElevation
+              onClick={invokeStartNode}
+            >
+              Start
+            </Button>
+          </Grid>
         </Grid>
 
-        <Grid
-          item
-          container
-          sx={{
-            flexDirection: 'column',
-            borderRadius: '4px',
-            background: '#46525D',
-          }}
-        >
-          <Grid item sx={{ pl: 2, pr: 2, pt: 2, pb: 1 }}>
-            <Chip label={nodeStatus} color={getStatusColor(nodeStatus)} />
+        <Grid item container>
+          <Grid item container>
+            <InputBase
+              sx={{
+                width: '100%',
+                cursor: 'pointer',
+                background: 'white',
+                p: 1.5,
+                maxWidth: 800,
+                mb: 2,
+                borderRadius: '4px',
+                fontSize: '0.8rem',
+              }}
+              inputProps={{
+                style: {
+                  cursor: 'pointer',
+                },
+              }}
+              readOnly
+              onClick={() => copyToClipboard()}
+              spellCheck={false}
+              value={getSocketPath()}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton edge="end">
+                    <ContentCopyIcon />
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
           </Grid>
-          <Box
+
+          <Grid
+            item
+            container
             sx={{
+              flexDirection: 'column',
+              borderRadius: '4px',
               background: '#46525D',
-              color: 'white',
-              height: 200,
-              pl: 2,
-              pr: 2,
-              pb: 2,
-              verticalAlign: 'top',
             }}
           >
-            {format(nodeLog)}
-          </Box>
+            <Grid item sx={{ pl: 2, pr: 2, pt: 2, pb: 1 }}>
+              <Chip label={nodeStatus} color={getStatusColor(nodeStatus)} />
+            </Grid>
+            <Box
+              sx={{
+                background: '#46525D',
+                color: 'white',
+                height: 200,
+                pl: 2,
+                pr: 2,
+                pb: 2,
+                verticalAlign: 'top',
+              }}
+            >
+              {format(nodeLog)}
+            </Box>
+          </Grid>
         </Grid>
       </Grid>
     </Grid>

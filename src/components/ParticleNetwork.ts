@@ -93,8 +93,6 @@ export default class ParticleNetwork {
         if (this.options.interactive) {
           this.particles.push(this.mouseParticle!);
         }
-
-        requestAnimationFrame(this.update.bind(this));
       }, 500);
     };
 
