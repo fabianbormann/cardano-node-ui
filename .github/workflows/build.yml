@@ -53,7 +53,7 @@ jobs:
           sed -i 's,fabianbormann/cardano-node-ui/releases/download/v${{ env.PREVIOUS_VERSION }}/cardano-node-ui-${{ env.PREVIOUS_VERSION }}.dmg,fabianbormann/cardano-node-ui/releases/download/v${{ env.VERSION }}/cardano-node-ui-${{ env.VERSION }}.dmg,' README.md
           sed -i 's,fabianbormann/cardano-node-ui/releases/download/v${{ env.PREVIOUS_VERSION }}/cardano-node-ui-${{ env.PREVIOUS_VERSION }}.AppImage,fabianbormann/cardano-node-ui/releases/download/v${{ env.VERSION }}/cardano-node-ui-${{ env.VERSION }}.AppImage,' README.md
           sed -i 's,fabianbormann/cardano-node-ui/releases/download/v${{ env.PREVIOUS_VERSION }}/cardano-node-ui-Setup-${{ env.PREVIOUS_VERSION }}.exe,fabianbormann/cardano-node-ui/releases/download/v${{ env.VERSION }}/cardano-node-ui-Setup-${{ env.VERSION }}.exe,' README.md
-          sed -i 's,📦 Cardano Node Ui v${{ env.VERSION }},📦 Cardano Node Ui v${{ env.VERSION }},' README.md
+          sed -i 's,📦 Cardano Node Ui v${{ env.PREVIOUS_VERSION }},📦 Cardano Node Ui v${{ env.VERSION }},' README.md
 
       - name: 📬 Commit Changes
         run: |
