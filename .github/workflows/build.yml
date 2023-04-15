@@ -32,7 +32,7 @@ jobs:
           release: ${{ startsWith(github.ref, 'refs/tags/v') }}
   update-readme:
     runs-on: ubuntu-latest
-    #needs: release
+    needs: release
     steps:
       - name: ⬇️ Checkout repository
         uses: actions/checkout@v3
@@ -41,10 +41,8 @@ jobs:
 
       - name: 👀 Compute versions
         run: |
-          #echo "PREVIOUS_VERSION=$(perl -ne 'print $1 if /📦 Cardano Node Ui v([^\s]+)/' README.md)" >> $GITHUB_ENV
-          #echo "VERSION=$(echo "${{ github.ref }}" | sed 's/refs\/tags\/v//')" >> $GITHUB_ENV
-          echo "VERSION=0.1.3" >> $GITHUB_ENV
-          echo "PREVIOUS_VERSION=0.1.2" >> $GITHUB_ENV
+          echo "PREVIOUS_VERSION=$(perl -ne 'print $1 if /📦 Cardano Node Ui v([^\s]+)/' README.md)" >> $GITHUB_ENV
+          echo "VERSION=$(echo "${{ github.ref }}" | sed 's/refs\/tags\/v//')" >> $GITHUB_ENV
 
       - name: 📝 Update Readme with Version
         run: |
