@@ -56,7 +56,7 @@ jobs:
           sed -i 's,📦 Cardano Node Ui v${{ env.VERSION }},📦 Cardano Node Ui v${{ env.VERSION }},' README.md
 
       - name: 📬 Commit Changes
-        uses: EndBug/add-and-commit@v7
+        uses: EndBug/add-and-commit@v9
         with:
           author_name: GitHub Actions
           author_email: actions@github.com
