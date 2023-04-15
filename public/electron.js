@@ -4,12 +4,12 @@ const {
   nativeImage,
   ipcMain,
   dialog,
+  shell,
 } = require('electron');
 const path = require('path');
 const isDev = require('electron-is-dev');
 const Downloader = require('nodejs-file-downloader');
 const spawn = require('child_process').spawn;
-const os = require('os');
 const fs = require('fs/promises');
 const ip = require('ip');
 
@@ -206,13 +206,32 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 
+  ipcMain.on('open-external-url', (_event, url) => {
+    shell.openExternal(url);
+  });
+
+  ipcMain.on('close-app', () => {
+    app.quit();
+  });
+
   ipcMain.on('open-dialog', (event) => {
     event.returnValue = dialog.showOpenDialogSync({
       properties: ['openDirectory', 'createDirectory', 'promptToCreate'],
     });
   });
 
-  ipcMain.on('start-node', async (event, directory, network = 'mainnet') => {
+  ipcMain.on('get-socket-path', (event, directory, network) => {
+    const databaseDirectory = path.join(directory, `${network}-db`);
+    const socketPath = path.join(databaseDirectory, 'node.socket');
+
+    if (process.platform === 'win32') {
+      event.returnValue = `setx CARDANO_NODE_SOCKET_PATH "${socketPath}"`;
+    } else {
+      event.returnValue = `export CARDANO_NODE_SOCKET_PATH="${socketPath}"`;
+    }
+  });
+
+  ipcMain.on('start-node', async (_event, directory, network = 'mainnet') => {
     mainWindow.webContents.send('node-status', {
       id: 0,
       timestamp: new Date().getTime(),

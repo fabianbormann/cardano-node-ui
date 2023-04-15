@@ -19,6 +19,8 @@ import {
   useTheme,
 } from '@mui/material';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import InfoIcon from '@mui/icons-material/Info';
 import reactStringReplace from 'react-string-replace';
 import { Box } from '@mui/system';
 
@@ -176,6 +178,26 @@ const Dashboard = () => {
     return 'info';
   };
 
+  const getSocketPath = () => {
+    if (!directory || !selectedNetwork) {
+      return;
+    }
+
+    const getSocketPath = (window as any).electron?.getSocketPath;
+    if (typeof getSocketPath === 'function') {
+      return getSocketPath(directory, selectedNetwork);
+    }
+    return '';
+  };
+
+  const copyToClipboard = () => {
+    const socketPath = getSocketPath();
+    navigator.clipboard.writeText(socketPath);
+    setSnackbarMessage(`Copied "${socketPath}" to clipboard`);
+    setSnackbarType('success');
+    setSnackbarOpen(true);
+  };
+
   return (
     <Grid
       container
@@ -210,77 +232,136 @@ const Dashboard = () => {
         }}
       >
         <Grid item container sx={{ justifyContent: 'center' }}>
-          <InputBase
-            sx={{
-              minWidth: 500,
-              background: 'white',
-              p: 2,
-              borderRadius: '4px',
-            }}
-            spellCheck={false}
-            value={directory}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setDirectory(event.target.value);
-            }}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton onClick={openDirectoryDialog} edge="end">
-                  <FolderOpenIcon />
-                </IconButton>
-              </InputAdornment>
-            }
-          />
-          <Select
-            sx={{
-              ml: 1,
-              background:
-                selectedNetwork === 'mainnet'
-                  ? 'white'
-                  : theme.palette.warning.main,
-            }}
-            value={selectedNetwork}
-            onChange={(event) => setSelectedNetwork(event.target.value)}
-          >
-            <MenuItem value="mainnet">Mainnet</MenuItem>
-            <MenuItem value="preprod">Preprod</MenuItem>
-            <MenuItem value="preview">Preview</MenuItem>
-          </Select>
-          <Button
-            sx={{ ml: 1, p: 2.5 }}
-            variant="contained"
-            color="secondary"
-            disableElevation
-            onClick={invokeStartNode}
-          >
-            Start
-          </Button>
+          <Grid item container sx={{ justifyContent: 'center' }}>
+            <InputBase
+              sx={{
+                minWidth: 500,
+                background: 'white',
+                p: 2,
+                borderRadius: '4px',
+              }}
+              spellCheck={false}
+              value={directory}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setDirectory(event.target.value);
+              }}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton onClick={openDirectoryDialog} edge="end">
+                    <FolderOpenIcon />
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
+            <Select
+              sx={{
+                ml: 1,
+                background:
+                  selectedNetwork === 'mainnet'
+                    ? 'white'
+                    : theme.palette.warning.main,
+              }}
+              value={selectedNetwork}
+              onChange={(event) => setSelectedNetwork(event.target.value)}
+            >
+              <MenuItem value="mainnet">Mainnet</MenuItem>
+              <MenuItem value="preprod">Preprod</MenuItem>
+              <MenuItem value="preview">Preview</MenuItem>
+            </Select>
+            <Button
+              sx={{ ml: 1, p: 2.5 }}
+              variant="contained"
+              color="secondary"
+              disableElevation
+              onClick={invokeStartNode}
+            >
+              Start
+            </Button>
+          </Grid>
         </Grid>
 
-        <Grid
-          item
-          container
-          sx={{
-            flexDirection: 'column',
-            borderRadius: '4px',
-            background: '#46525D',
-          }}
-        >
-          <Grid item sx={{ pl: 2, pr: 2, pt: 2, pb: 1 }}>
-            <Chip label={nodeStatus} color={getStatusColor(nodeStatus)} />
-          </Grid>
-          <Box
+        <Grid item container>
+          <Grid
+            item
+            container
             sx={{
-              background: '#46525D',
-              color: 'white',
-              height: 200,
-              pl: 2,
-              pr: 2,
-              pb: 2,
-              verticalAlign: 'top',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              mb: 2,
+              flexWrap: 'nowrap',
             }}
           >
-            {format(nodeLog)}
-          </Box>
+            <InputBase
+              sx={{
+                width: '100%',
+                cursor: 'pointer',
+                background: 'white',
+                p: 1.5,
+                maxWidth: 800,
+                borderRadius: '4px',
+                fontSize: '0.8rem',
+              }}
+              inputProps={{
+                style: {
+                  cursor: 'pointer',
+                },
+              }}
+              readOnly
+              onClick={() => copyToClipboard()}
+              spellCheck={false}
+              value={getSocketPath()}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton edge="end">
+                    <ContentCopyIcon />
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
+            <IconButton
+              sx={{ ml: 1 }}
+              size="large"
+              color="secondary"
+              onClick={() => {
+                const openUrlInBrowser = (window as any).electron
+                  ?.openUrlInBrowser;
+                if (typeof openUrlInBrowser === 'function') {
+                  openUrlInBrowser(
+                    'https://developers.cardano.org/docs/get-started/running-cardano/#querying-the-cardano-blockchain'
+                  );
+                }
+              }}
+            >
+              <InfoIcon />
+            </IconButton>
+          </Grid>
+
+          <Grid
+            item
+            container
+            sx={{
+              flexDirection: 'column',
+              borderRadius: '4px',
+              background: '#46525D',
+            }}
+          >
+            <Grid item sx={{ pl: 2, pr: 2, pt: 2, pb: 1 }}>
+              <Chip label={nodeStatus} color={getStatusColor(nodeStatus)} />
+            </Grid>
+            <Box
+              sx={{
+                background: '#46525D',
+                color: 'white',
+                height: 200,
+                pl: 2,
+                pr: 2,
+                pb: 2,
+                verticalAlign: 'top',
+              }}
+            >
+              {format(nodeLog)}
+            </Box>
+          </Grid>
         </Grid>
       </Grid>
     </Grid>
