@@ -4,6 +4,12 @@ contextBridge.exposeInMainWorld('electron', {
   closeApp: () => {
     return ipcRenderer.sendSync('close-app');
   },
+  getSocketPath: (directory, network) => {
+    return ipcRenderer.sendSync('get-socket-path', directory, network);
+  },
+  openUrlInBrowser: (url) => {
+    ipcRenderer.send('open-external-url', url);
+  },
   openDialog: () => {
     return ipcRenderer.sendSync('open-dialog');
   },
