@@ -61,3 +61,4 @@ jobs:
           author_name: GitHub Actions
           author_email: actions@github.com
           message: 'chore: update README.md with version ${{ env.VERSION }}'
+          push: '--force'
