@@ -37,7 +37,7 @@ jobs:
       - name: ⬇️ Checkout repository
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
 
       - name: 👀 Compute versions
         run: |
