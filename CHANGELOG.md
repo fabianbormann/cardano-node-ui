@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.3](https://github.com/fabianbormann/cardano-node-ui/compare/v0.1.2...v0.1.3) (2023-04-15)
+
+
+### Features
+
+* add copy field for node.socket path ([f36dbdb](https://github.com/fabianbormann/cardano-node-ui/commit/f36dbdb0242491c8b271dbe0515155b85ff695f7))
+
+
+### Bug Fixes
+
+* prevent increasing background speed ([261c609](https://github.com/fabianbormann/cardano-node-ui/commit/261c609a8513ecab0db631e85d7e8611f93ac26c))
+* the app will close if clicking the close button ([d6d66ac](https://github.com/fabianbormann/cardano-node-ui/commit/d6d66ac9a37d23fef4eb2e1488c0d473f2ce8d96))
+
 ## [0.1.2](https://github.com/fabianbormann/cardano-node-ui/compare/v0.1.1...v0.1.2) (2023-04-12)
 
 
