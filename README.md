@@ -9,6 +9,9 @@
 
 This project aims to provide a streamlined, single-click ui solution for launching a Cardano node
 
+<img src="https://user-images.githubusercontent.com/1525818/232276588-89c5288d-42a6-4820-975b-7e2c25cf75da.png" width="75%"/>
+
+
 ## 📌 Download Latest Release
 
 📦 Cardano Node Ui v0.1.4
