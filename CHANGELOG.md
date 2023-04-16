@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/fabianbormann/cardano-node-ui/compare/v0.1.3...v0.1.4) (2023-04-16)
+
+
+### Bug Fixes
+
+* define a relative project root to ensure that there is no empty window when opening the app ([8f6a58a](https://github.com/fabianbormann/cardano-node-ui/commit/8f6a58a3ba8c21edcdf37d7db1cb225a778d0b8d))
+
 ## [0.1.3](https://github.com/fabianbormann/cardano-node-ui/compare/v0.1.2...v0.1.3) (2023-04-15)
 
 
