@@ -179,7 +179,6 @@ const Dashboard = () => {
   };
 
   const getSocketPath = () => {
-    console.log(directory, selectedNetwork);
     if (!directory || !selectedNetwork) {
       return;
     }
