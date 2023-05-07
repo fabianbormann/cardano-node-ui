@@ -52,7 +52,10 @@
     "eject": "react-scripts eject",
     "dev": "concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\"",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test": "start-server-and-test dev localhost:3000 cypress:run"
   },
   "eslintConfig": {
     "extends": [
@@ -73,8 +76,10 @@
     ]
   },
   "devDependencies": {
+    "cypress": "^12.9.0",
     "electron": "^22.1.0",
-    "electron-builder": "^23.6.0"
+    "electron-builder": "^23.6.0",
+    "start-server-and-test": "^2.0.0"
   },
   "build": {
     "productName": "Cardano Node Ui",

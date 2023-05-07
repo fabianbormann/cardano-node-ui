@@ -1,7 +1,7 @@
 # Cardano Node Ui
 
 <p align="left">
-
+<img alt="Test" src="https://img.shields.io/github/actions/workflow/status/fabianbormann/cardano-node-ui/test.yml?label=Test&style=for-the-badge" />
 <img alt="Release" src="https://img.shields.io/github/actions/workflow/status/fabianbormann/cardano-node-ui/release.yml?label=Release&style=for-the-badge" />
 <img alt="Build" src="https://img.shields.io/github/actions/workflow/status/fabianbormann/cardano-node-ui/build.yml?label=Build&style=for-the-badge" />
 <a href="https://conventionalcommits.org"><img alt="conventionalcommits" src="https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&style=for-the-badge" /></a>
@@ -10,7 +10,6 @@
 This project aims to provide a streamlined, single-click ui solution for launching a Cardano node
 
 <img src="https://user-images.githubusercontent.com/1525818/232276588-89c5288d-42a6-4820-975b-7e2c25cf75da.png" width="75%"/>
-
 
 ## 📌 Download Latest Release
 

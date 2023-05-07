@@ -254,6 +254,10 @@ const Dashboard = () => {
               }
             />
             <Select
+              data-testid="network-selector"
+              inputProps={{
+                'data-testid': 'network-selector-input',
+              }}
               sx={{
                 ml: 1,
                 background:
@@ -264,9 +268,15 @@ const Dashboard = () => {
               value={selectedNetwork}
               onChange={(event) => setSelectedNetwork(event.target.value)}
             >
-              <MenuItem value="mainnet">Mainnet</MenuItem>
-              <MenuItem value="preprod">Preprod</MenuItem>
-              <MenuItem value="preview">Preview</MenuItem>
+              <MenuItem data-testid="network-option-mainnet" value="mainnet">
+                Mainnet
+              </MenuItem>
+              <MenuItem data-testid="network-option-preprod" value="preprod">
+                Preprod
+              </MenuItem>
+              <MenuItem data-testid="network-option-preview" value="preview">
+                Preview
+              </MenuItem>
             </Select>
             <Button
               sx={{ ml: 1, p: 2.5 }}
@@ -292,6 +302,7 @@ const Dashboard = () => {
             }}
           >
             <InputBase
+              data-testid="socket-path-field"
               sx={{
                 width: '100%',
                 cursor: 'pointer',
