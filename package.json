@@ -2,7 +2,7 @@
   "name": "cardano-node-ui",
   "homepage": "./",
   "description": "This project aims to provide a streamlined, single-click ui solution for launching a Cardano node",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "Fabian Bormann <contact@coineda.io>",
   "license": "Apache-2.0",
   "dependencies": {

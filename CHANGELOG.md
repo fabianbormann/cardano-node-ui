@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/fabianbormann/cardano-node-ui/compare/v0.1.4...v0.1.5) (2023-05-07)
+
+
+### Features
+
+* add dashboard test ([85c4ca4](https://github.com/fabianbormann/cardano-node-ui/commit/85c4ca4f3cd2cf46b55710e604ad9d290938e821))
+
 ## [0.1.4](https://github.com/fabianbormann/cardano-node-ui/compare/v0.1.3...v0.1.4) (2023-04-16)
 
 
