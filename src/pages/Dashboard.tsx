@@ -105,8 +105,19 @@ const Dashboard = () => {
 
     const startNode = (window as any).electron?.startNode;
     if (typeof startNode === 'function') {
-      startNode(directory, selectedNetwork);
       setNodeRunning(true);
+      setNodeLog([
+        { status: 'idle', message: 'cardano-node-ui:~$', id: -1, timestamp: 0 },
+      ]);
+      startNode(directory, selectedNetwork);
+    }
+  };
+
+  const stopNode = () => {
+    const stopNode = (window as any).electron?.stopNode;
+    if (typeof stopNode === 'function') {
+      stopNode();
+      setNodeRunning(false);
     }
   };
 
@@ -125,7 +136,7 @@ const Dashboard = () => {
           );
           formattedMessage = formattedMessage.replaceAll('#{:x:}', '❌');
 
-          if (ids.includes(line.id)) {
+          if (ids.includes(line.id) && line.id !== -1) {
             const timestamp = Object.keys(messages).find(
               (key) => messages[key as unknown as number].id === line.id
             ) as unknown as number;
@@ -196,6 +207,45 @@ const Dashboard = () => {
     setSnackbarMessage(`Copied "${socketPath}" to clipboard`);
     setSnackbarType('success');
     setSnackbarOpen(true);
+  };
+
+  const getActionButton = () => {
+    if (nodeStatus === 'idle' || nodeStatus === 'error') {
+      return (
+        <Button
+          sx={{ ml: 1, p: 2.5 }}
+          variant="contained"
+          color="secondary"
+          disableElevation
+          onClick={invokeStartNode}
+        >
+          Start
+        </Button>
+      );
+    } else if (nodeStatus === 'shutdown') {
+      return (
+        <Button
+          sx={{ ml: 1, p: 2.5, background: '#767676 !important' }}
+          variant="contained"
+          disableElevation
+          disabled
+        >
+          Stop
+        </Button>
+      );
+    } else {
+      return (
+        <Button
+          sx={{ ml: 1, p: 2.5 }}
+          variant="contained"
+          color="warning"
+          disableElevation
+          onClick={stopNode}
+        >
+          Stop
+        </Button>
+      );
+    }
   };
 
   return (
@@ -278,15 +328,7 @@ const Dashboard = () => {
                 Preview
               </MenuItem>
             </Select>
-            <Button
-              sx={{ ml: 1, p: 2.5 }}
-              variant="contained"
-              color="secondary"
-              disableElevation
-              onClick={invokeStartNode}
-            >
-              Start
-            </Button>
+            {getActionButton()}
           </Grid>
         </Grid>
 

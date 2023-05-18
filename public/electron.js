@@ -13,6 +13,12 @@ const spawn = require('child_process').spawn;
 const fs = require('fs/promises');
 const ip = require('ip');
 
+let nodeInstance = null;
+let intervalId = -1;
+let nodeRunning = false;
+
+class NodeAlreadyRunningError extends Error {}
+
 const networks = {
   mainnet: {
     protocolMagic: 764824073,
@@ -96,6 +102,10 @@ const unpackArchive = (directory) =>
 
 const startNode = (directory, network) =>
   new Promise((resolve, reject) => {
+    if (nodeInstance !== null) {
+      throw new NodeAlreadyRunningError();
+    }
+
     const nodeBinary = nodeBinaries[process.platform];
     const configDirectory = path.join(directory, `${network}-config`);
     const databaseDirectory = path.join(directory, `${network}-db`);
@@ -104,7 +114,7 @@ const startNode = (directory, network) =>
       nodeBinary.replace('.tar.gz', '').replace('.zip', '')
     );
 
-    const child = spawn(path.join(binaryPath, 'cardano-node'), [
+    nodeInstance = spawn(path.join(binaryPath, 'cardano-node'), [
       'run',
       '--topology',
       path.join(configDirectory, 'topology.json'),
@@ -119,20 +129,20 @@ const startNode = (directory, network) =>
       '--config',
       path.join(configDirectory, 'config.json'),
     ]);
-    child.on('close', (code) => {
-      console.log(`child process exited with code ${code}`);
-      if (code === 0) {
-        resolve();
-      } else {
-        reject();
-      }
+
+    nodeInstance.on('error', (error) => {
+      console.log(`child process exited with error ${error.name}`);
+      console.log(error.message);
+      reject();
     });
 
-    child.stdout.on('data', (data) => {
+    nodeInstance.on('spawn', () => resolve());
+
+    nodeInstance.stdout.on('data', (data) => {
       console.log(`stdout: ${data}`);
     });
 
-    child.stderr.on('data', (data) => {
+    nodeInstance.stderr.on('data', (data) => {
       console.error(`stderr: ${data}`);
     });
   });
@@ -197,8 +207,6 @@ function createWindow() {
   return mainWindow;
 }
 
-let intervalId = -1;
-
 app.whenReady().then(() => {
   const mainWindow = createWindow();
 
@@ -231,7 +239,21 @@ app.whenReady().then(() => {
     }
   });
 
+  ipcMain.on('stop-node', () => {
+    if (nodeRunning) {
+      nodeRunning = false;
+      mainWindow.webContents.send('node-status', {
+        id: -1,
+        timestamp: new Date().getTime(),
+        status: 'shutdown',
+        message: 'stopping the node ⏸ #{...}',
+      });
+    }
+  });
+
   ipcMain.on('start-node', async (_event, directory, network = 'mainnet') => {
+    nodeRunning = true;
+
     mainWindow.webContents.send('node-status', {
       id: 0,
       timestamp: new Date().getTime(),
@@ -261,6 +283,17 @@ app.whenReady().then(() => {
       return;
     }
 
+    if (!nodeRunning) {
+      mainWindow.webContents.send('node-status', {
+        id: -1,
+        timestamp: new Date().getTime(),
+        status: 'idle',
+        message: 'the node has been successfully stopped ✅!',
+      });
+
+      return;
+    }
+
     mainWindow.webContents.send('node-status', {
       id: 0,
       timestamp: new Date().getTime(),
@@ -275,6 +308,15 @@ app.whenReady().then(() => {
       message: 'download configuration and node topology #{...}',
     });
     await downloadConfig(directory, network);
+    if (!nodeRunning) {
+      mainWindow.webContents.send('node-status', {
+        id: -1,
+        timestamp: new Date().getTime(),
+        status: 'idle',
+        message: 'the node has been successfully stopped ✅!',
+      });
+      return;
+    }
     mainWindow.webContents.send('node-status', {
       id: 1,
       timestamp: new Date().getTime(),
@@ -310,7 +352,48 @@ app.whenReady().then(() => {
       message: 'node initialization running  #{...}',
     });
 
-    startNode(directory, network);
+    try {
+      await startNode(directory, network);
+    } catch (error) {
+      if (error instanceof NodeAlreadyRunningError) {
+        mainWindow.webContents.send('node-status', {
+          id: 2,
+          timestamp: new Date().getTime(),
+          status: 'running',
+          message: 'node already running',
+        });
+      } else {
+        mainWindow.webContents.send('node-status', {
+          id: 2,
+          timestamp: new Date().getTime(),
+          status: 'error',
+          message: `failed to start node${
+            typeof error.message !== 'undefined' && ': ' + error.message
+          }`,
+        });
+      }
+      return;
+    }
+
+    if (nodeRunning) {
+      mainWindow.webContents.send('node-status', {
+        id: 2,
+        timestamp: new Date().getTime(),
+        status: 'running',
+        message: 'the node is up and running 🚀!',
+      });
+    } else {
+      nodeInstance.kill('SIGINT');
+      nodeInstance = null;
+      mainWindow.webContents.send('node-status', {
+        id: -1,
+        timestamp: new Date().getTime(),
+        status: 'idle',
+        message: 'the node has been successfully stopped ✅!',
+      });
+      return;
+    }
+
     const nodeBinary = nodeBinaries[process.platform];
     const binaryPath = path.join(
       directory,
@@ -318,6 +401,19 @@ app.whenReady().then(() => {
     );
 
     const getCurrentTip = () => {
+      if (!nodeRunning) {
+        mainWindow.webContents.send('node-status', {
+          id: -1,
+          timestamp: new Date().getTime(),
+          status: 'idle',
+          message: 'the node has been successfully stopped ✅!',
+        });
+        nodeInstance.kill('SIGINT');
+        nodeInstance = null;
+        clearInterval(intervalId);
+        intervalId = -1;
+        return;
+      }
       const databaseDirectory = path.join(directory, `${network}-db`);
       const args = ['query', 'tip'];
 
@@ -349,6 +445,7 @@ app.whenReady().then(() => {
           }
         }
       });
+
       child.stderr.on('data', (data) => {
         console.error(`stderr: ${data}`);
       });
