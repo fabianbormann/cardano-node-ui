@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/fabianbormann/cardano-node-ui/compare/v0.1.5...v0.1.6) (2023-05-18)
+
+
+### Features
+
+* disable button while restarting ([4d53d22](https://github.com/fabianbormann/cardano-node-ui/commit/4d53d22428a3e98b6b00384bee8ab5fcb790624d))
+
 ## [0.1.5](https://github.com/fabianbormann/cardano-node-ui/compare/v0.1.4...v0.1.5) (2023-05-07)
 
 
