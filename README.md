@@ -15,9 +15,9 @@ This project aims to provide a streamlined, single-click ui solution for launchi
 
 📦 Cardano Node Ui v0.1.6
 
-<div><a href="https://github.com/fabianbormann/cardano-node-ui/releases/download/vrefs/heads/main/cardano-node-ui-0.1.6.dmg">⬇️ Download | OS X 🍎</a></div>
-<div><a href="https://github.com/fabianbormann/cardano-node-ui/releases/download/vrefs/heads/main/cardano-node-ui-0.1.6.AppImage">⬇️ Download | Linux 🐧</a></div>
-<div><a href="https://github.com/fabianbormann/cardano-node-ui/releases/download/vrefs/heads/main/cardano-node-ui-Setup-0.1.6.exe">⬇️ Download | Windows 🪟🪟</a></div>
+<div><a href="https://github.com/fabianbormann/cardano-node-ui/releases/download/v0.1.6/cardano-node-ui-0.1.6.dmg">⬇️ Download | OS X 🍎</a></div>
+<div><a href="https://github.com/fabianbormann/cardano-node-ui/releases/download/v0.1.6/cardano-node-ui-0.1.6.AppImage">⬇️ Download | Linux 🐧</a></div>
+<div><a href="https://github.com/fabianbormann/cardano-node-ui/releases/download/v0.1.6/cardano-node-ui-Setup-0.1.6.exe">⬇️ Download | Windows 🪟🪟</a></div>
 
 ## ❤️‍🔥 Motivation
 
