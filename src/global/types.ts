@@ -1,6 +1,6 @@
 export type MessageType = 'success' | 'error' | 'warning' | 'info';
 
-export type NodeStatus = 'idle' | 'download' | 'running' | 'error';
+export type NodeStatus = 'idle' | 'download' | 'running' | 'error' | 'shutdown';
 export type IpcEventListener = (
   channel: string,
   callback: (argument: any) => void

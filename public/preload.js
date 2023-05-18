@@ -22,4 +22,5 @@ contextBridge.exposeInMainWorld('electron', {
   getDefaultDirectory: () => ipcRenderer.invoke('getDefaultPath'),
   startNode: (directory, network) =>
     ipcRenderer.send('start-node', directory, network),
+  stopNode: () => ipcRenderer.send('stop-node'),
 });
