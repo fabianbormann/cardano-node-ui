@@ -42,7 +42,7 @@ jobs:
       - name: 👀 Compute versions
         run: |
           echo "PREVIOUS_VERSION=$(perl -ne 'print $1 if /📦 Cardano Node Ui v([^\s]+)/' README.md)" >> $GITHUB_ENV
-          echo "VERSION=$(echo "${{ github.ref }}" | sed 's/refs\/tags\/v//')" >> $GITHUB_ENV
+          echo "VERSION=$(sed -n 's/.*\"version\": *\"\([^\"]*\)\".*/\1/p' package.json)" >> $GITHUB_ENV
 
       - name: 📝 Update Readme with Version
         run: |
